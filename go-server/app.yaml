@@ -1,0 +1,14 @@
+runtime: go121
+env: standard
+
+instance_class: F1
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+
+env_variables:
+  DB_URI: "mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/?retryWrites=true&w=majority"
+  DB_NAME: "divadb"
+  DB_COLLECTION_NAME: "todolist"

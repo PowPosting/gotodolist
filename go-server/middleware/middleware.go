@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -46,18 +47,24 @@ func createDBInstance() {
 	// Collection name
 	collName := os.Getenv("DB_COLLECTION_NAME")
 	
-	// Set client options
-	clientOptions := options.Client().ApplyURI(connectionString)
+	// Set client options with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	
+	clientOptions := options.Client().
+		ApplyURI(connectionString).
+		SetServerSelectionTimeout(20 * time.Second).
+		SetConnectTimeout(20 * time.Second)
 
 	// connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(ctx, clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(ctx, nil)
 
 	if err != nil {
 		log.Fatal(err)
