@@ -6,15 +6,15 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with legacy peer deps
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
 
 # Set environment variable for API URL
 ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_API_URL=${REACT_APP_API_URL:-https://tugas-cc-480903.de.r.appspot.com}
 
 # Build app with legacy OpenSSL
 ENV NODE_OPTIONS=--openssl-legacy-provider
