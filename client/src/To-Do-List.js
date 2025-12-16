@@ -1,6 +1,6 @@
-import React, { Component } from "react";
 import axios from "axios";
-import { Card, Header, Form, Input, Icon } from "semantic-ui-react";
+import { Component } from "react";
+import { Card, Form, Header, Icon, Input } from "semantic-ui-react";
 
 // Use environment variable or default to localhost for development
 let endpoint = process.env.REACT_APP_API_URL || "http://localhost:8080";

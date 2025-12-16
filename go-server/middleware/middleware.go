@@ -42,17 +42,17 @@ func loadTheEnv() {
 func createDBInstance() {
 	// DB connection string
 	connectionString := os.Getenv("DB_URI")
-	
+
 	// Database Name
 	dbName := os.Getenv("DB_NAME")
 
 	// Collection name
 	collName := os.Getenv("DB_COLLECTION_NAME")
-	
+
 	// Set client options with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	
+
 	clientOptions := options.Client().
 		ApplyURI(connectionString).
 		SetServerSelectionTimeout(20 * time.Second).
