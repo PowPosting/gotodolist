@@ -4,7 +4,7 @@ This is a to-do list application. The complete tutorial is published on [my blog
 
 **Server: Golang  
 Client: React, semantic-ui-react  
-Database: Local MongoDB**
+Database: MongoDB**
 
 The offline version of application `Get Shit Done` is hosted at
 
@@ -13,6 +13,50 @@ The offline version of application `Get Shit Done` is hosted at
 :link: http://getshitdone.surge.sh
 
 > Offline to-do app instruction. [here](https://codesource.io/building-an-offline-to-do-app-with-react/)
+---
+
+# :rocket: Deployment
+
+## Deploy to Google Cloud Platform (GCP) App Engine
+
+### Prerequisites
+1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed
+2. GCP project created
+3. MongoDB Atlas account (for cloud database) or MongoDB connection string
+
+### Setup Steps
+
+1. **Configure Database Connection**
+   - Update `go-server/app.yaml` with your MongoDB connection string:
+   ```yaml
+   env_variables:
+     DB_URI: "your-mongodb-connection-string"
+     DB_NAME: "divadb"
+     DB_COLLECTION_NAME: "todolist"
+   ```
+
+2. **Initialize GCP Project**
+   ```bash
+   gcloud init
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+3. **Deploy Backend**
+   ```bash
+   cd go-server
+   gcloud app deploy app.yaml
+   ```
+
+4. **Deploy Frontend (Optional - Static Hosting)**
+   ```bash
+   cd client
+   npm run build
+   # Upload build folder to Cloud Storage or use Firebase Hosting
+   ```
+
+### GitHub Repository
+:link: https://github.com/PowPosting/gotodolist
+
 ---
 
 # Highlights
