@@ -1,5 +1,4 @@
 node_modules
-build
 .git
 .gitignore
 README.md
@@ -10,3 +9,5 @@ README.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+Dockerfile
+cloudbuild.yaml
