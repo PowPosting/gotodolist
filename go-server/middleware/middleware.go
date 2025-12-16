@@ -29,11 +29,13 @@ func init() {
 }
 
 func loadTheEnv() {
-	// load .env file
+	// load .env file for local development only
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		// In production (like App Engine), env vars are set in app.yaml
+		// So we don't need to fatal here
+		log.Println("No .env file found, using environment variables")
 	}
 }
 

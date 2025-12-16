@@ -17,42 +17,79 @@ The offline version of application `Get Shit Done` is hosted at
 
 # :rocket: Deployment
 
-## Deploy to Google Cloud Platform (GCP) App Engine
+## Deploy to Google Cloud Platform (GCP)
 
 ### Prerequisites
 1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed
-2. GCP project created
-3. MongoDB Atlas account (for cloud database) or MongoDB connection string
+2. [Firebase CLI](https://firebase.google.com/docs/cli#install_the_firebase_cli) installed: `npm install -g firebase-tools`
+3. GCP project created with Firebase enabled
+4. MongoDB Atlas account (for cloud database)
 
 ### Setup Steps
 
-1. **Configure Database Connection**
-   - Update `go-server/app.yaml` with your MongoDB connection string:
-   ```yaml
-   env_variables:
-     DB_URI: "your-mongodb-connection-string"
-     DB_NAME: "divadb"
-     DB_COLLECTION_NAME: "todolist"
-   ```
+#### 1. Configure Database Connection
+Update [go-server/app.yaml](go-server/app.yaml) with your MongoDB connection string:
+```yaml
+env_variables:
+  DB_URI: "your-mongodb-atlas-connection-string"
+  DB_NAME: "divadb"
+  DB_COLLECTION_NAME: "todolist"
+```
 
-2. **Initialize GCP Project**
-   ```bash
-   gcloud init
-   gcloud config set project YOUR_PROJECT_ID
-   ```
+#### 2. Deploy Backend to App Engine
+```bash
+# Login to Google Cloud
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
 
-3. **Deploy Backend**
-   ```bash
-   cd go-server
-   gcloud app deploy app.yaml
-   ```
+# Deploy backend
+cd go-server
+gcloud app deploy
 
-4. **Deploy Frontend (Optional - Static Hosting)**
-   ```bash
-   cd client
-   npm run build
-   # Upload build folder to Cloud Storage or use Firebase Hosting
-   ```
+# Get backend URL (e.g., https://YOUR_PROJECT_ID.appspot.com)
+gcloud app browse
+```
+
+#### 3. Update Frontend API URL
+Update [client/.env.production](client/.env.production) with your backend URL:
+```
+REACT_APP_API_URL=https://YOUR_PROJECT_ID.appspot.com
+```
+
+#### 4. Deploy Frontend to Firebase Hosting
+```bash
+# Login to Firebase
+firebase login
+
+# Build React app
+cd client
+npm install
+npm run build
+
+# Deploy to Firebase Hosting
+cd ..
+firebase deploy --only hosting
+
+# Your app will be live at: https://YOUR_PROJECT_ID.web.app
+```
+
+### Quick Deploy Commands
+```bash
+# Backend
+cd ~/gotodolist/go-server && gcloud app deploy
+
+# Frontend
+cd ~/gotodolist/client && npm run build && cd .. && firebase deploy --only hosting
+```
+
+### Architecture
+```
+User → Firebase Hosting (Frontend React)
+         ↓ API calls
+       App Engine (Backend Go)
+         ↓
+       MongoDB Atlas (Database)
+```
 
 ### GitHub Repository
 :link: https://github.com/PowPosting/gotodolist

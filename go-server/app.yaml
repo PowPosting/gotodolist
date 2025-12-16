@@ -9,6 +9,6 @@ handlers:
     secure: always
 
 env_variables:
-  DB_URI: "mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/?retryWrites=true&w=majority"
+  DB_URI: "mongodb+srv://divadb:divadbuser@divadb.kzthfni.mongodb.net/?appName=divadb"
   DB_NAME: "divadb"
   DB_COLLECTION_NAME: "todolist"

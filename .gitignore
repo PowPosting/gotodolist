@@ -3,6 +3,11 @@
 # Deployment files
 .gcloudignore
 
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
 # Environment
 .env
 .env.local
