@@ -150,7 +150,7 @@ class ToDoList extends Component {
       <div>
         <div className="row">
           <Header className="header" as="h2">
-            TO DO LIST
+            To-Dolist Test
           </Header>
         </div>
         <div className="row">
