@@ -12,10 +12,9 @@ RUN npm install --legacy-peer-deps
 # Copy all source
 COPY . .
 
-# Build app
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# Build app with legacy OpenSSL in the RUN command
 ENV REACT_APP_API_URL=https://tugas-cc-480903.de.r.appspot.com
-RUN npm run build
+RUN export NODE_OPTIONS=--openssl-legacy-provider && npm run build
 
 # Production stage
 FROM nginx:alpine
