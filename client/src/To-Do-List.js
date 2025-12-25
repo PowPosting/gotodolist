@@ -1,8 +1,10 @@
+<<<<<<< HEAD
+=======
+/* eslint-disable react/react-in-jsx-scope */
+>>>>>>> 2ed9980849d6d29014334e252fd659c7159b5b47
 import React, { Component } from "react";
 import axios from "axios";
 import { Card, Form, Header, Icon, Input } from "semantic-ui-react";
-
-// Use environment variable or default to localhost for development
 let endpoint = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
 class ToDoList extends Component {
@@ -150,7 +152,11 @@ class ToDoList extends Component {
       <div>
         <div className="row">
           <Header className="header" as="h2">
+<<<<<<< HEAD
             TO DO LIST APP
+=======
+            To-Dolist App Test3
+>>>>>>> 2ed9980849d6d29014334e252fd659c7159b5b47
           </Header>
         </div>
         <div className="row">
