@@ -16,9 +16,8 @@ COPY . .
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=${REACT_APP_API_URL:-https://tugas-cc-480903.de.r.appspot.com}
 
-# Build app with legacy OpenSSL
-ENV NODE_OPTIONS=--openssl-legacy-provider
-RUN npm run build
+# Build app with legacy OpenSSL - run node directly with flag
+RUN node --openssl-legacy-provider node_modules/.bin/react-scripts build
 
 # Production stage
 FROM nginx:alpine
