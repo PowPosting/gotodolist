@@ -20,7 +20,7 @@ func main() {
 		port = "8080"
 	}
 
-	fmt.Printf("Starting server on port %s...\n", port)
+	fmt.Printf("Go Todo List Server running on port  %s...\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
