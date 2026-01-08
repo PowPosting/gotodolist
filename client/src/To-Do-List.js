@@ -151,7 +151,7 @@ class ToDoList extends Component {
       <div>
         <div className="row">
           <Header className="header" as="h2">
-             Aplikasi To Do List 1
+             Aplikasi To Do List 2
           </Header>
         </div>
         <div className="row">
