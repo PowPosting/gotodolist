@@ -51,3 +51,11 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# GCP Service Account Keys
+key.json
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!manifest.json

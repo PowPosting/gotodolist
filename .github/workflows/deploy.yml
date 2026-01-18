@@ -1,0 +1,129 @@
+name: CI/CD Pipeline - Deploy to GCP VM
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Step 2: Get version from tag or commit
+      - name: Get Version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/v//' || echo "0.0.0")
+            COMMIT_SHA=$(git rev-parse --short HEAD)
+            echo "version=$VERSION-$COMMIT_SHA" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+          echo "Building version: $(cat $GITHUB_OUTPUT | grep version | cut -d'=' -f2)"
+
+      # Step 3: Setup Google Cloud SDK
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # Step 3: Authenticate Docker with GCR
+      - name: Authenticate Docker to GCR
+        run: |
+          gcloud auth configure-docker
+
+      # Step 4: Build and Push Backend Docker Image
+      - name: Build and Push Backend
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:${{ steps.version.outputs.version }} ./go-server
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:latest ./go-server
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:${{ steps.version.outputs.version }}
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:latest
+
+      # Step 5: Build and Push Frontend Docker Image
+      - name: Build and Push Frontend
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:${{ steps.version.outputs.version }} \
+            --build-arg REACT_APP_API_URL=http://${{ secrets.GCP_VM_IP }}:8080 \
+            ./client
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:latest \
+            --build-arg REACT_APP_API_URL=http://${{ secrets.GCP_VM_IP }}:8080 \
+            ./client
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:${{ steps.version.outputs.version }}
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:latest
+
+      # Step 6: Deploy to VM
+      - name: Deploy to GCP VM
+        run: |
+          gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
+            --zone ${{ secrets.GCP_VM_ZONE }} \
+            --command "
+              # Authenticate Docker on VM
+              gcloud auth configure-docker &&
+              
+              # Pull latest images
+              docker pull gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:latest &&
+              docker pull gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:latest &&
+              
+              # Stop and remove old containers
+              docker stop go-server react-client || true &&
+              docker rm go-server react-client || true &&
+              
+              # Run new containers
+              docker run -d -p 8080:8080 \
+                --name go-server \
+                --restart always \
+                gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:latest &&
+              
+              docker run -d -p 80:8080 \
+                --name react-client \
+                --restart always \
+                gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:latest &&
+              
+              # Clean up unused images
+              doDeployed version: ${{ steps.version.outputs.version }}"
+          echo "Backend should be accessible at: http://${{ secrets.GCP_VM_IP }}:8080"
+          echo "Frontend should be accessible at: http://${{ secrets.GCP_VM_IP }}"
+
+      # Step 8: Create GitHub Release (only for tags)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          body: |
+            ## Version ${{ steps.version.outputs.tag }}
+            
+            ### Deployed to:
+            - Frontend: http://${{ secrets.GCP_VM_IP }}
+            - Backend: http://${{ secrets.GCP_VM_IP }}:8080
+            
+            ### Docker Images:
+            - `gcr.io/${{ secrets.GCP_PROJECT_ID }}/go-server:${{ steps.version.outputs.version }}`
+            - `gcr.io/${{ secrets.GCP_PROJECT_ID }}/react-client:${{ steps.version.outputs.version }}`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Verify Deployment
+      - name: Verify Deployment
+        run: |
+          echo "Backend should be accessible at: http://${{ secrets.GCP_VM_IP }}:8080"
+          echo "Frontend should be accessible at: http://${{ secrets.GCP_VM_IP }}"

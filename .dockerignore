@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+DEPLOYMENT.md
+LICENSE
+*.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI/CD
+.github
+cloudbuild.yaml
+
+# IDE
+.vscode
+.idea
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+images/
+netlify.toml
+CNAME

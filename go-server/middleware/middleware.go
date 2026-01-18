@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -237,4 +238,54 @@ func deleteAllTask() int64 {
 
 	fmt.Println("Deleted Document", d.DeletedCount)
 	return d.DeletedCount
+}
+
+// GetVersion returns API version information
+func GetVersion(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	version := map[string]interface{}{
+		"version":    os.Getenv("APP_VERSION"),
+		"buildDate":  os.Getenv("BUILD_DATE"),
+		"goVersion":  runtime.Version(),
+		"apiVersion": "v1",
+	}
+
+	// If env vars not set, use defaults from version.go
+	if version["version"] == "" {
+		version["version"] = "1.0.0"
+	}
+	if version["buildDate"] == "" {
+		version["buildDate"] = "2026-01-18"
+	}
+
+	json.NewEncoder(w).Encode(version)
+}
+
+// HealthCheck returns service health status
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Check DB connection
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	dbStatus := "healthy"
+	err := collection.Database().Client().Ping(ctx, nil)
+	if err != nil {
+		dbStatus = "unhealthy"
+	}
+
+	health := map[string]interface{}{
+		"status":   "ok",
+		"database": dbStatus,
+		"uptime":   time.Now().Format(time.RFC3339),
+	}
+
+	if dbStatus == "unhealthy" {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}
+
+	json.NewEncoder(w).Encode(health)
 }
