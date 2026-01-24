@@ -1,17 +1,4 @@
 services:
-  mongo:
-    image: mongo:7.0
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=tododb
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - app-network
-
   backend:
     image: go-to-do-server:${VERSION:-latest}
     build:
@@ -23,11 +10,9 @@ services:
     restart: always
     environment:
       - PORT=8080
-      - DB_URI=mongodb://mongo:27017/tododb
-      - DB_NAME=tododb
-      - DB_COLLECTION_NAME=todolist
-    depends_on:
-      - mongo
+      - DB_URI=${DB_URI:-mongodb+srv://divadb:divadbuser@divadb.kzthfni.mongodb.net/?appName=divadb}
+      - DB_NAME=${DB_NAME:-divadb}
+      - DB_COLLECTION_NAME=${DB_COLLECTION_NAME:-todolist}
     networks:
       - app-network
 
@@ -50,7 +35,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  mongo-data:
-    driver: local
