@@ -4,7 +4,8 @@ import axios from "axios";
 import { Card, Form, Header, Icon, Input } from "semantic-ui-react";
 
 
-let endpoint = process.env.REACT_APP_API_URL || "";
+// Gunakan relative path untuk nginx proxy
+const endpoint = "";
 
 class ToDoList extends Component {
   constructor(props) {
