@@ -13,6 +13,7 @@ services:
       - app-network
 
   backend:
+    image: go-to-do-server:${VERSION:-latest}
     build:
       context: ./go-server
       dockerfile: Dockerfile
@@ -31,6 +32,7 @@ services:
       - app-network
 
   frontend:
+    image: go-to-do-client:${VERSION:-latest}
     build:
       context: ./client
       dockerfile: Dockerfile
