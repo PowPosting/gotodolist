@@ -12,9 +12,9 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Set environment variable for API URL
+# Set environment variable for API URL (relative path untuk nginx proxy)
 ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=${REACT_APP_API_URL:-https://tugas-cc-480903.de.r.appspot.com}
+ENV REACT_APP_API_URL=${REACT_APP_API_URL:-}
 
 # Build app with legacy OpenSSL - run node directly with flag
 RUN node --openssl-legacy-provider node_modules/.bin/react-scripts build
