@@ -4,7 +4,7 @@ import axios from "axios";
 import { Card, Form, Header, Icon, Input } from "semantic-ui-react";
 
 
-let endpoint = process.env.REACT_APP_API_URL || "http://localhost:8080";
+let endpoint = process.env.REACT_APP_API_URL || "";
 
 class ToDoList extends Component {
   constructor(props) {
